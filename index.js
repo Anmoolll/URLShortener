@@ -3,6 +3,8 @@ import connectToDB from './connect.js';
 import dotenv from "dotenv";
 import { URL } from './models/url.js';
 import path from 'path'
+import cookieParser from 'cookie-parser';
+import { restrictToLoggedInUsers } from './middleware/auth.js'
 
 import staticRouter from './routes/staticRouter.js'
 import urlRoute from './routes/url.js'
@@ -19,9 +21,9 @@ app.set("views", path.resolve('./views'))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended : false }))
+app.use(cookieParser)
 
-app.use('/url', urlRoute)
-// correctly mount user routes with leading slash so signup POSTs hit the right handler
+app.use('/url', restrictToLoggedInUsers, urlRoute)
 app.use('/user', userRoute)
 app.use('/', staticRouter)
 
