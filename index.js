@@ -1,10 +1,12 @@
 import express from 'express';
-import urlRoute from './routes/url.js'
 import connectToDB from './connect.js';
 import dotenv from "dotenv";
 import { URL } from './models/url.js';
 import path from 'path'
+
 import staticRouter from './routes/staticRouter.js'
+import urlRoute from './routes/url.js'
+import userRoute from './routes/user.js'
 
 const app = express();
 const PORT = 3000;
@@ -18,8 +20,12 @@ app.set("views", path.resolve('./views'))
 app.use(express.json())
 app.use(express.urlencoded({ extended : false }))
 
-app.use('/', staticRouter)
 app.use('/url', urlRoute)
+// correctly mount user routes with leading slash so signup POSTs hit the right handler
+app.use('/user', userRoute)
+app.use('/', staticRouter)
+
+
 app.use('/:shortID', async (req, res) => {
     const shortID = req.params.shortID;
     const entry = await URL.findOneAndUpdate({
@@ -30,6 +36,10 @@ app.use('/:shortID', async (req, res) => {
         }
         }
     })
+
+    if (!entry) {
+        return res.status(404).json({ error: 'Short URL not found' });
+    }
 
     res.redirect(entry.redirectURL);
 })
