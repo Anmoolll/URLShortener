@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { URL } from './models/url.js';
 import path from 'path'
 import cookieParser from 'cookie-parser';
-import { restrictToLoggedInUsers } from './middleware/auth.js'
+import { restrictToLoggedInUsers, checkAuth } from './middleware/auth.js'
 
 import staticRouter from './routes/staticRouter.js'
 import urlRoute from './routes/url.js'
@@ -21,11 +21,11 @@ app.set("views", path.resolve('./views'))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended : false }))
-app.use(cookieParser)
+app.use(cookieParser())
 
 app.use('/url', restrictToLoggedInUsers, urlRoute)
 app.use('/user', userRoute)
-app.use('/', staticRouter)
+app.use('/', checkAuth, staticRouter)
 
 
 app.use('/:shortID', async (req, res) => {
@@ -47,4 +47,3 @@ app.use('/:shortID', async (req, res) => {
 })
 
 app.listen(PORT, () => console.log(`Server started on ${PORT}`))
-

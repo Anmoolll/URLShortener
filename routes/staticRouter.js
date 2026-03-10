@@ -3,7 +3,9 @@ import { URL } from '../models/url.js';
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    const allURL = await URL.find({});
+
+    if(!req.user) return res.render('login');
+    const allURL = await URL.find({createdBy: req.user._id});
     return res.render('home', {
         urls: allURL,
     });
