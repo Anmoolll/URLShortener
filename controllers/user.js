@@ -1,6 +1,5 @@
 import user from '../models/user.js';
-import { v4 } from 'uuid';
-import {setUser} from '../service/auth.js'
+import {setUser} from '../service/auth.js';
 
 export async function handleUserSignup(req, res){
     const {name, email, password } = req.body;
@@ -23,9 +22,12 @@ export async function handleUserLogin(req, res){
         error: "Invalid email or password"
     })
 
-    const sessionId = v4();
-    setUser(sessionId, User);
-    res.cookie('uid', sessionId);
+    const token = setUser(User);
+    // store the JWT in a cookie so auth middleware can read it
+    res.cookie('uid', token, {
+        httpOnly: true,
+        // optional: secure: true, sameSite: 'lax'
+    });
     res.redirect("/");
 }
 
