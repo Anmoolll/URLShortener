@@ -1,10 +1,10 @@
 import express from 'express'
 import { URL } from '../models/url.js';
+import { restrictTo } from '../middleware/auth.js';
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', restrictTo(["NORMAL"]) ,async (req, res) => {
 
-    if(!req.user) return res.render('login');
     const allURL = await URL.find({createdBy: req.user._id});
     return res.render('home', {
         urls: allURL,

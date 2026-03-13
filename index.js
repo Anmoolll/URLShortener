@@ -22,9 +22,9 @@ app.set("views", path.resolve('./views'))
 app.use(express.json())
 app.use(express.urlencoded({ extended : false }))
 app.use(cookieParser())
-app.use(checkForAuthentication())
+app.use(checkForAuthentication)
 
-app.use('/url', restrictTo("NORMAL") ,urlRoute)
+app.use('/url', restrictTo(["NORMAL"]) ,urlRoute)
 app.use('/user', userRoute)
 app.use('/', staticRouter)
 

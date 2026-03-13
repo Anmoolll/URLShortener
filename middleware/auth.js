@@ -1,15 +1,14 @@
 import {getUser} from '../service/auth.js'
 
 export function checkForAuthentication(req, res, next){
-    const AuthorizationHeaderValue = req.headers["authorization"];
+    const tokenCookie = req.cookies?.token;
     req.user = null;
 
-    if(!AuthorizationHeaderValue || 
-        !AuthorizationHeaderValue.startsWith("Bearer ")){
+    if(!tokenCookie){
         return next();
     }
 
-    const token = AuthorizationHeaderValue.split("Bearer ")[1];
+    const token = tokenCookie;
     const user = getUser(token);
 
     req.user = user;

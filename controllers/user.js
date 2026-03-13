@@ -24,10 +24,7 @@ export async function handleUserLogin(req, res){
 
     const token = setUser(User);
     // store the JWT in a cookie so auth middleware can read it
-    res.cookie('uid', token, {
-        httpOnly: true,
-        // optional: secure: true, sameSite: 'lax'
-    });
+    res.cookie('token', token);
     res.redirect("/");
 }
 
