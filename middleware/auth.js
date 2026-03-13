@@ -1,21 +1,29 @@
 import {getUser} from '../service/auth.js'
 
-export async function restrictToLoggedInUsers(req, res, next){
-    const userUid = req.cookies?.uid;
+export function checkForAuthentication(req, res, next){
+    const AuthorizationHeaderValue = req.headers["authorization"];
+    req.user = null;
 
-    if(!userUid) return res.redirect("/login");
-    
-    const user = getUser(userUid);
+    if(!AuthorizationHeaderValue || 
+        !AuthorizationHeaderValue.startsWith("Bearer ")){
+        return next();
+    }
 
-    if(!user) return res.redirect("/login");
+    const token = AuthorizationHeaderValue.split("Bearer ")[1];
+    const user = getUser(token);
 
     req.user = user;
-    next();
+    return next()
 }
 
-export async function checkAuth(req, res, next){
-    const userUid = req.cookies?.uid;
-    const user = getUser(userUid);
-    req.user = user;
-    next();
+export function restrictTo(roles = []){
+    return function (req, res, next){
+        if(!req.user){
+            return res.redirect("/login");
+        }
+
+        if(!roles.includes(req.user.role)) return res.end("Unauthorized");
+
+        return next();
+    }
 }

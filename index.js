@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { URL } from './models/url.js';
 import path from 'path'
 import cookieParser from 'cookie-parser';
-import { restrictToLoggedInUsers, checkAuth } from './middleware/auth.js'
+import { checkForAuthentication, restrictTo } from './middleware/auth.js'
 
 import staticRouter from './routes/staticRouter.js'
 import urlRoute from './routes/url.js'
@@ -22,10 +22,11 @@ app.set("views", path.resolve('./views'))
 app.use(express.json())
 app.use(express.urlencoded({ extended : false }))
 app.use(cookieParser())
+app.use(checkForAuthentication())
 
-app.use('/url', restrictToLoggedInUsers, urlRoute)
+app.use('/url', restrictTo("NORMAL") ,urlRoute)
 app.use('/user', userRoute)
-app.use('/', checkAuth, staticRouter)
+app.use('/', staticRouter)
 
 
 app.use('/:shortID', async (req, res) => {
